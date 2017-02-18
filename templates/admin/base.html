@@ -28,12 +28,16 @@
         {% block usertools %}
         <div id="user-tools">
             {% block welcome-msg %}
+              {% if user.is_active or user.is_staff or user.is_superuser %}
                 {% trans 'Welcome,' %}
                 <strong>{% firstof user.get_short_name user.get_username %}</strong>.
+              {% endif%}
             {% endblock %}
             {% block userlinks %}
-                {% if site_url %}
-                    <a href="{{ site_url }}">{% trans 'View site' %}</a> /
+                {% if user.is_active or user.is_staff or user.is_superuser %}
+                  {% if site_url %}
+                      <a href="{{ site_url }}">{% trans 'View site' %}</a> /
+                  {% endif %}
                 {% endif %}
                 {% if user.is_active and user.is_staff %}
                     {% url 'django-admindocs-docroot' as docsroot %}
@@ -44,7 +48,9 @@
                 {% if user.has_usable_password %}
                 <a href="{% url 'admin:password_change' %}">{% trans 'Change password' %}</a> /
                 {% endif %}
+                {% if user.is_active or user.is_staff or user.is_superuser %}
                 <a href="{% url 'admin:logout' %}">{% trans 'Log out' %}</a>
+                {% endif %}
             {% endblock %}
         </div>
         {% endblock %}
