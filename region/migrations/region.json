@@ -1,0 +1,58 @@
+[
+   {
+    "fields":
+      {
+        "rght": 8,
+        "name": "UK",
+        "parent": null,
+        "level": 0,
+        "file_name": "UK.txt",
+        "lft": 1,
+        "tree_id": 1
+      },
+      "model": "region.region",
+      "pk": 1
+    },
+    {
+      "fields":
+      {
+        "rght": 3,
+        "name": "England",
+        "parent": 1,
+        "level": 1,
+        "file_name": "England.txt",
+        "lft": 2,
+        "tree_id": 1
+      },
+      "model": "region.region",
+      "pk": 2
+    },
+    {
+      "fields":
+      {
+        "rght": 5,
+        "name": "Wales",
+        "parent": 1,
+        "level": 1,
+        "file_name": "Wales.txt",
+        "lft": 4,
+        "tree_id": 1
+      },
+      "model": "region.region",
+      "pk": 3
+    },
+    {
+      "fields":
+      {
+        "rght": 7,
+        "name": "Scotland",
+        "parent": 1,
+        "level": 1,
+        "file_name": "Scotland.txt",
+        "lft": 6,
+        "tree_id": 1
+      },
+      "model": "region.region",
+      "pk": 4
+    }
+]

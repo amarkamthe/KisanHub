@@ -5,14 +5,33 @@
 {% endblock %}
 
 {% block content %}
-<div class ="row" style = "margin-left:0.5%;">
+{# Load the tag library #}
+{% load bootstrap3 %}
 
-<div style ="margin:auto;witdth:20%,margin-top:100px;">
-	<a href="admin/"><h2>Database Adminstration </h2></a>
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+
+<div class="row">
+	<div class="col-md-6">
+		<a href="admin/"><h4>Database Adminstration </h4></a>
+	</div>
+	<div class="col-md-2 pull-right">
+		<form method="post">
+			{%csrf_token%}
+			<input type="submit" class="btn btn-primary" value="Sync data"/>
+		</form>
+	</div>
 </div>
-
-<div style ="margin:auto;witdth:20%,margin-top:100px;">
-	<a href="sync_data/"><h2>Sync data </h2></a>
+<div class="row">
+	<div class="col-md-6">
+		<a href="">Analysis</a>
+	</div>
+</div>
+<div class="row">
+	<div class="col-md-6">
+		<a href="">Facts</a>
+	</div>
 </div>
 {% endblock %}
 

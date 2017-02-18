@@ -37,6 +37,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'bootstrap3',
     'region',
 )
 
@@ -84,6 +85,10 @@ USE_L10N = True
 
 USE_TZ = True
 
+try:
+    from local_settings import *
+except:
+    pass
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
