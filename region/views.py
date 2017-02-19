@@ -1,12 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
-# from django.http import HttpResponse
+from django.http import HttpResponse
 # from django.template import RequestContext, loader
 from django.views.generic import TemplateView
 from django.utils.decorators import method_decorator
 from django.contrib import messages
 from django.shortcuts import render
 from statistics import *
+import json
 
 class IndexView(TemplateView):
 	template_name = 'index.html'
@@ -30,3 +31,13 @@ class IndexView(TemplateView):
 			messages.error(request, 'Some error occurred while syncing data ('+str(e)+')')
 
 		return super(IndexView, self).render_to_response(context)
+
+@staff_member_required
+def analysis(request, component):
+	region = Region.objects.all().values('id','name')
+	return render(request, "analysis.html", {'region':region, 'component':component})
+
+@staff_member_required
+def rainfall(request, component, region):
+	region_data = region_statistical_data(region, component)
+	return HttpResponse(json.dumps(region_data), content_type="application/json")

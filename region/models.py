@@ -7,6 +7,7 @@ COMPONENT_TYPE_CHOICES = (
         ('2', 'Tmax'),
         ('3', 'Tmean'),
         ('4', 'Sunshine'),
+        ('5', 'Rainfall'),
     )
 # Create your models here.
 class Region(MPTTModel):
@@ -26,7 +27,7 @@ class StatisticalData(models.Model):
 
     def __unicode__(self):
         """Returns string representation of object"""
-        return self.region.name + " : " + self.year + "("+self.component+")"
+        return self.region.name + " : " + str(self.year) + "("+self.component+")"
 
     class Meta:
         """Metadata for class Statistical Data"""

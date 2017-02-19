@@ -1,0 +1,138 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+<style>
+
+svg {
+	width: 1200px;
+	height: 1200px;
+	font-family: helvetica, sans-serif;
+}
+text.label {
+	font-size: 12px;
+	font-weight: bold;
+  fill:red;
+}
+
+text.label.rainfall {
+	font-size: 12px;
+  fill:red;
+}
+</style>
+<script src="/static/js/d3.v3.min.js"></script>
+<script src="/static/js/circularHeatChart.js"></script>
+<script>
+var component={{component}};
+$(document).ready(function(){
+  var color = ['white', 'orange'];
+  $("#component").html("Sunshine analysis");
+  if (component=="5"){
+    $("#component").html("Rainfall analysis");
+    color = ['white', 'blue'];
+  }
+  $("#region").change(function(){
+    if($(this).val()!="0"){
+      $(".overlay").show();
+    draw_region($(this).val());
+  }
+  else{
+    alert("Please select some value");
+  }
+  });
+
+
+
+function draw_region(region_select){
+d3.json('/analysis_data/'+component+'/'+region_select, function(regionData) {
+  var region = Object.keys(regionData);
+  $.each(region, function(k,v){
+    var rainfallData = regionData[v];
+    var region_class = "chart";
+    // var newdiv = $('<div>');
+    // newdiv.addClass(region_class);
+    // newdiv.append($("#chart").clone()[0].innerHTML);
+    // $("#rain").append(newdiv);
+    //$("#"+region_class+" .statLabel").html("Data for "+v);
+    var years = Object.keys(rainfallData);
+
+  	var data = [];
+  	for(var i = 0; i < years.length; i++) {
+  		for(var j = 0; j < 12; j++) {
+  			data.push( { i : (i*12)+j, d: rainfallData[years[i]][j] } );
+  		}
+  	}
+
+  	var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  	var y = years;
+  	var years = [];
+  	for(var i = y[0]; i < y[y.length-1]; i++)
+  		i % 10 === 0 ? years.push(i) : years.push('');
+
+  	var chart = circularHeatChart()
+  		.accessor(function(d) {return d.d;})
+  		.segmentHeight(4)
+  		.innerRadius(50)
+  		.numSegments(12)
+  		.margin({top: 20, right: 20, bottom: 20, left: 130})
+  		.domain([50, 200])
+  		.range(color)
+  		.segmentLabels(months)
+  		.radialLabels(years);
+
+    var select_region = '#'+region_class
+  	d3.select(select_region+' svg')
+  		.data([data])
+  		.call(chart);
+
+  	//// Events
+  	function updateStatus() {
+  		var data = d3.select(this).data()[0];
+  		var month = months[data.i % 12];
+  		var year = 1910 + Math.floor(data.i / 12);
+  		var rainfall = data.d;
+  	    d3.select(select_region+' svg .period.label')
+  	    	.text(month + ' ' + year);
+  	    d3.select(select_region+' svg .rainfall.label')
+  	    	.text(rainfall+'mm');
+  	}
+  	function clearStatus() {
+  	    d3.select(select_region+' svg .period.label')
+  	    	.text('');
+  	    d3.select(select_region+' svg .rainfall.label')
+  	    	.text('');
+  	}
+  	d3.selectAll(select_region+' path').on('mouseover', updateStatus);
+  	d3.selectAll(select_region+' path').on('mouseout', clearStatus);
+    $(".overlay").hide();
+  });
+
+});
+}
+});
+</script>
+<h2 id="component"></h2>
+<div class="overlay">
+  <div id="loading-img"></div>
+</div>
+<select id="region">
+  <option value="0">--Please Select --</option>
+  {% for reg in region %}
+    <option value="{{reg.id}}">{{reg.name}} </option>
+  {% endfor %}
+</select>
+<div id="rain">
+<div id="chart">
+	<svg>
+		<text class="label period" y="412" ></text>
+		<text class="label rainfall" y="432"></text>
+	</svg>
+</div>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}
