@@ -20,8 +20,9 @@
 <script src="/static/js/d3.v3.min.js"></script>
 <script>
 var component={{component}};
+var component_dict ={"5":"Rainfall", "1":"Min Temperature", "2":"Max Temperature", "4":"Sunshine"};
 $(document).ready(function(){
-  component_dict ={"5":"Rainfall", "1":"Min Temperature", "2":"Max Temperature", "4":"Sunshine"}
+
   $("#component").html(component_dict[component]);
 
   var margins = {
@@ -121,6 +122,9 @@ function analysis_fact(data){
   });
   message += "</ul>";
   $("#factmessage").html(message);
+  var fact_message = "In last couple of decades it is been observed that the "+ component_dict[component];
+  fact_message += "<br/> is been increased as you see below top values."
+  $("#factdata").html(fact_message);
 
 }
 
@@ -147,7 +151,10 @@ function analysis_fact(data){
 </select>
 <div>
   <h3 style="display:none;">
-    <span style="font-weight:bold;">Fact: </span><br/>
+
+    <span style="font-weight:bold;">Fact:</span>
+    <span id="factdata"></span>
+    <br/>
     <span id="factmessage"></span>
   </h3>
 </div>
