@@ -41,3 +41,8 @@ def analysis(request, component):
 def rainfall(request, component, region):
 	region_data = region_statistical_data(region, component)
 	return HttpResponse(json.dumps(region_data), content_type="application/json")
+
+@staff_member_required
+def temperature_analysis(request, component):
+	region = Region.objects.all().values('id','name')
+	return render(request, "temperature_analysis.html", {'region':region, 'component':component})

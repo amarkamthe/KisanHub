@@ -1,0 +1,213 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+<style>
+.name {
+    float:right;
+    color:#27aae1;
+}
+.axis {
+    fill: none;
+    stroke: #AAA;
+    stroke-width: 1px;
+}
+text {
+    stroke: none;
+    fill: #666666;
+    font-size: .6em;
+    font-family:"Helvetica Neue"
+}
+text.label {
+	font-size: 12px;
+	font-weight: bold;
+  fill:red;
+}
+.node {
+    cursor:pointer;
+}
+.dot {
+    opacity: .7;
+    cursor: pointer;
+}
+</style>
+<script src="/static/js/d3.v3.min.js"></script>
+<script>
+var component={{component}};
+$(document).ready(function(){
+  $("#component").html("Min temperature analysis");
+  if (component=="2"){
+    $("#component").html("Max temperature analysis");
+  }
+  var margins = {
+      "left": 40,
+          "right": 30,
+          "top": 30,
+          "bottom": 30
+  };
+
+  var width = 1000;
+  var height = 600;
+
+function draw_region(region_select){
+  d3.json('/analysis_data/'+component+'/'+region_select, function(regionData) {
+    var region = Object.keys(regionData);
+    $.each(region, function(k,v){
+      var temperatureData = regionData[v];
+      var years = Object.keys(temperatureData);
+      // this will be our colour scale. An Ordinal scale.
+      //var colors = d3.scale.category10();
+    	var data = [];
+    	for(var i = 0; i < years.length; i++) {
+    		for(var j = 0; j < 12; j++) {
+          var temperatureVal = temperatureData[years[i]][j];
+          var color = "#3399ff";
+          if(component=="1"){
+          if(temperatureVal >2.0 && temperatureVal<8.0){
+            color = "#ffcc99";
+          }
+          else if(temperatureVal >=8.0){
+            color  = "#ff471a";
+          }
+        }else{
+          if(temperatureVal >8.0 && temperatureVal<16.0){
+            color = "#ffcc99";
+          }
+          else if(temperatureVal >=16.0){
+            color  = "#ff471a";
+          }
+        }
+    			data.push( { i : (i*12)+j, d:temperatureVal , y:years[i] , c:color } );
+    		}
+    	}
+
+    	var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    	var y = years;
+    	var years = [];
+    	for(var i = y[0]; i < y[y.length-1]; i++)
+    		i % 10 === 0 ? years.push(i) : years.push('');
+
+      //d3.select("#scatter-load").append("text").attr("class","label").attr("id","temp").attr("y","200").attr("x","100");
+      // we add the SVG component to the scatter-load div
+      $("#scatter-load svg g").html("");
+      var svg = d3.select("#scatter-load svg").attr("width", width).attr("height", height).append("g")
+          .attr("transform", "translate(" + margins.left + "," + margins.top + ")");
+
+      var x = d3.scale.linear()
+          .domain(d3.extent(data, function (d) {
+          return 1910 + Math.floor(d.i / 12);
+      }))
+      // the range maps the domain to values from 0 to the width minus the left and right margins (used to space out the visualization)
+        .range([0, width - margins.left - margins.right]);
+
+      // this does the same as for the y axis but maps from the rating variable to the height to 0.
+      var y = d3.scale.linear()
+          .domain(d3.extent(data, function (d) {
+          return d.d;
+      }))
+      // Note that height goes first due to the weird SVG coordinate system
+      .range([height - margins.top - margins.bottom, 0]);
+
+      svg.append("g").attr("class", "x axis").attr("transform", "translate(0," + y.range()[0] + ")");
+      svg.append("g").attr("class", "y axis");
+
+      // this is our X axis label. Nothing too special to see here.
+      svg.append("text")
+          .attr("fill", "#414241")
+          .attr("text-anchor", "end")
+          .attr("x", width / 2)
+          .attr("y", height - 35)
+          .text("Years");
+
+
+      // this is the actual definition of our x and y axes. The orientation refers to where the labels appear - for the x axis, below or above the line, and for the y axis, left or right of the line. Tick padding refers to how much space between the tick and the label. There are other parameters too - see https://github.com/mbostock/d3/wiki/SVG-Axes for more information
+      var xAxis = d3.svg.axis().scale(x).orient("bottom").tickPadding(2);
+      var yAxis = d3.svg.axis().scale(y).orient("left").tickPadding(2);
+
+      // this is where we select the axis we created a few lines earlier. See how we select the axis item. in our svg we appended a g element with a x/y and axis class. To pull that back up, we do this svg select, then 'call' the appropriate axis object for rendering.
+      svg.selectAll("g.y.axis").call(yAxis);
+      svg.selectAll("g.x.axis").call(xAxis);
+
+      // now, we can get down to the data part, and drawing stuff. We are telling D3 that all nodes (g elements with class node) will have data attached to them. The 'key' we use (to let D3 know the uniqueness of items) will be the name. Not usually a great key, but fine for this example.
+      var monthYear = svg.selectAll("g.node").data(data, function (d) {
+          return (1910 + Math.floor(d.i / 12) + (d.i % 12)/100);
+      });
+
+      // we 'enter' the data, making the SVG group (to contain a circle and text) with a class node. This corresponds with what we told the data it should be above.
+
+      var monthYearGroup = monthYear.enter().append("g").attr("class", "node")
+      // this is how we set the position of the items. Translate is an incredibly useful function for rotating and positioning items
+      .attr('transform', function (d) {
+          return "translate(" + x(1910 + Math.floor(d.i / 12) +  (d.i % 12)/100) + "," + y(d.d) + ")";
+      });
+
+      // we add our first graphics element! A circle!
+      monthYearGroup.append("circle")
+          .attr("r", 5)
+          .attr("class", "dot")
+          .style("fill", function (d) {
+              // remember the ordinal scales? We use the colors scale to get a colour for our manufacturer. Now each node will be coloured
+              // by who makes the chocolate.
+              return d.c;//colors(d.i);
+      });
+
+      function updateStatus(){
+        var select_data="";
+        d3.select(this).append("text")
+            .style("text-anchor", "middle")
+            .attr("dy", -10)
+            .text(function (d) {
+                var month = months[d.i % 12];
+                var year = 1910 + Math.floor(d.i / 12);
+                var temp = data.d;
+                  // this shouldn't be a surprising statement.
+                select_data = month + " "+ year +" ("+d.d+")";
+                  return select_data;
+              });
+        $("#temp").text(select_data);
+      }
+      function clearStatus(){
+        $(this).find('text').text('');
+        $("#temp").text('');
+        //d3.select(this).append("text").attr("dy", -10).text('');
+      }
+      monthYearGroup.on('mouseover', updateStatus);
+      monthYearGroup.on('mouseout', clearStatus);
+
+  });
+  $(".overlay").hide();
+ });
+}
+  $("#region").change(function(){
+    if($(this).val()!="0"){
+      //$(".overlay").show();
+      draw_region($(this).val());
+  }
+  else{
+    alert("Please select some value");
+  }
+ });
+});
+</script>
+<h2 id="component"></h2>
+<div class="overlay">
+  <div id="loading-img"></div>
+</div>
+<select id="region">
+  <option value="0">--Please Select --</option>
+  {% for reg in region %}
+    <option value="{{reg.id}}">{{reg.name}} </option>
+  {% endfor %}
+</select>
+<div id="scatter-load">
+  <svg>
+    <text id="temp" class="label" y="20"></text>
+  </svg>
+</div>
+{% endblock %}
+
+{% block sidebar %}
+{% endblock %}

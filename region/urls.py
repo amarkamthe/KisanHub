@@ -9,4 +9,6 @@ urlpatterns = [
     url(r'^$', (views.IndexView).as_view(),name='index'),
     url(r'^analysis/(?P<component>[0-9]+)$', views.analysis, name='rainfall_analysis'),
     url(r'^analysis_data/(?P<component>[0-9]+)/(?P<region>[0-9]+)/$', views.rainfall, name='rainfall'),
+    url(r'^temperature/(?P<component>[0-9]+)$', views.temperature_analysis, name='temperature_analysis'),
+
 ]

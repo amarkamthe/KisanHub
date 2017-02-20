@@ -11,7 +11,11 @@
 {# Load CSS and JavaScript #}
 {% bootstrap_css %}
 {% bootstrap_javascript %}
-
+<style>
+.ulclass>li{
+	list-style-type:none;
+}
+</style>
 <div class="row">
 	<div class="col-md-6">
 		<a href="admin/"><h4>Database Adminstration </h4></a>
@@ -25,14 +29,16 @@
 </div>
 <div class="row">
 	<div class="col-md-6">
-		<a href="analysis/5"><h4>Rainfall Analysis</h4></a>
+			<h4>Analysis</h4>
+			<ul class="ulclass">
+				<li><a href="temperature/2"><h4>Max Temperature Analysis</h4></a></li>
+				<li><a href="temperature/1"><h4>Min Temperature Analysis</h4></a></li>
+				<li><a href="analysis/5"><h4>Rainfall Analysis</h4></a></li>
+				<li><a href="analysis/4"><h4>Sunshine Analysis</h4></a></li>
+			</ul>
 	</div>
 </div>
-<div class="row">
-	<div class="col-md-6">
-		<a href="analysis/4"><h4>Sunshine Analysis</h4></a>
-	</div>
-</div>
+
 {% endblock %}
 
 {% block sidebar %}
