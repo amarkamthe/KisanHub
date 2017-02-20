@@ -10,5 +10,6 @@ urlpatterns = [
     url(r'^analysis/(?P<component>[0-9]+)$', views.analysis, name='rainfall_analysis'),
     url(r'^analysis_data/(?P<component>[0-9]+)/(?P<region>[0-9]+)/$', views.rainfall, name='rainfall'),
     url(r'^temperature/(?P<component>[0-9]+)$', views.temperature_analysis, name='temperature_analysis'),
-
+    url(r'^analysis_fact/(?P<component>[0-9]+)$', views.analysis_fact, name='analysis_fact'),
+    url(r'^analysis_fact_data/(?P<component>[0-9]+)/(?P<region>[0-9]+)/$', views.analysis_fact_data, name='analysis_fact_data'),
 ]

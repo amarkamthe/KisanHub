@@ -58,3 +58,20 @@ def region_statistical_data(region_id, component):
             rainfall_data[rain.year]=data
         region_data[key]=rainfall_data
     return region_data
+
+def region_statistical_fact_data(region_id, component):
+    region = Region.objects.get(id=region_id)
+    rainfall = StatisticalData.objects.filter(region=region,component=component).select_related('region').order_by('year')
+    rainfall_year = itertools.groupby(rainfall, key=lambda x:x.region.name)
+    region_data = {}
+    for key, regions in rainfall_year:
+        rainfall_data = {}
+        set_val = 0
+        for index, rain in enumerate(regions):
+            data = json.loads(rain.blob)
+            data = data[len(data)-1]
+            if data and type(data)!=str:
+                rainfall_data[rain.year]=data
+
+        region_data[key]=rainfall_data
+    return region_data

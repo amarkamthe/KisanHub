@@ -183,7 +183,7 @@ function draw_region(region_select){
 }
   $("#region").change(function(){
     if($(this).val()!="0"){
-      //$(".overlay").show();
+      $(".overlay").show();
       draw_region($(this).val());
   }
   else{
