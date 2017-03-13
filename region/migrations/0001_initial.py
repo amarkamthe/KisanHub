@@ -8,7 +8,7 @@ from sys import path
 from django.core import serializers
 import os
 
-fixture_filename = 'region.json'
+fixture_filename = '/srv/KisanHub/region/migrations/region.json'
 def load_fixture(apps, schema_editor):
     fixture_file = os.path.join(fixture_filename)
 
